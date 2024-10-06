@@ -1,0 +1,148 @@
+package OnlineReservationSystem;
+
+import java.util.Scanner;
+import java.util.HashMap;
+
+class ReservationSystem {   
+    static class Reservation {
+        String trainNumber;
+        String trainName;
+        String classType;
+        String from;
+        String to;
+        String journeyDate;
+        String pnr;
+
+        Reservation(String trainNumber, String trainName, String classType, String from, String to, String journeyDate, String pnr) {
+            this.trainNumber = trainNumber;
+            this.trainName = trainName;
+            this.classType = classType;
+            this.from = from;
+            this.to = to;
+            this.journeyDate = journeyDate;
+            this.pnr = pnr;
+        }
+
+        public String toString() {
+            return "PNR: " + pnr + "\nTrain Number: " + trainNumber + "\nTrain Name: " + trainName + "\nClass: " + classType +
+                    "\nFrom: " + from + "\nTo: " + to + "\nJourney Date: " + journeyDate;
+        }
+    }
+
+    private HashMap<String, String> users = new HashMap<>();
+    private HashMap<String, Reservation> reservations = new HashMap<>();
+
+    public ReservationSystem() {
+        // Adding a demo user (loginId: password)
+        users.put("user123", "pass123");
+    }
+
+    // Login method
+    public boolean login(String loginId, String password) {
+        return users.containsKey(loginId) && users.get(loginId).equals(password);
+    }
+
+    // Method to make a reservation
+    public String makeReservation(String trainNumber, String trainName, String classType, String from, String to, String journeyDate) {
+        String pnr = "PNR" + (reservations.size() + 1); // Generating a simple PNR
+        Reservation reservation = new Reservation(trainNumber, trainName, classType, from, to, journeyDate, pnr);
+        reservations.put(pnr, reservation);
+        return pnr;
+    }
+
+    // Method to cancel a reservation
+    public boolean cancelReservation(String pnr) {
+        if (reservations.containsKey(pnr)) {
+            reservations.remove(pnr);
+            return true;
+        }
+        return false;
+    }
+
+    // Method to view reservation by PNR
+    public String viewReservation(String pnr) {
+        if (reservations.containsKey(pnr)) {
+            return reservations.get(pnr).toString();
+        }
+        return "Reservation not found.";
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ReservationSystem system = new ReservationSystem();
+
+        System.out.println("Welcome to the Online Reservation System");
+
+        // User login
+        System.out.print("Enter Login ID: ");
+        String loginId = scanner.nextLine();
+        System.out.print("Enter Password: ");
+        String password = scanner.nextLine();
+
+        if (system.login(loginId, password)) {
+            System.out.println("Login successful!");
+
+            boolean exit = false;
+            while (!exit) {
+                System.out.println("\n1. Make Reservation");
+                System.out.println("2. Cancel Reservation");
+                System.out.println("3. View Reservation");
+                System.out.println("4. Exit");
+                System.out.print("Choose an option: ");
+                int choice = scanner.nextInt();
+                scanner.nextLine(); 
+
+                switch (choice) {
+                    case 1:
+                        // Reservation form
+                        System.out.print("Enter Train Number: ");
+                        String trainNumber = scanner.nextLine();
+                        System.out.print("Enter Train Name: ");
+                        String trainName = scanner.nextLine();
+                        System.out.print("Enter Class Type: ");
+                        String classType = scanner.nextLine();
+                        System.out.print("Enter From: ");
+                        String from = scanner.nextLine();
+                        System.out.print("Enter To: ");
+                        String to = scanner.nextLine();
+                        System.out.print("Enter Journey Date (DD/MM/YYYY): ");
+                        String journeyDate = scanner.nextLine();
+
+                        String pnr = system.makeReservation(trainNumber, trainName, classType, from, to, journeyDate);
+                        System.out.println("Reservation successful! Your PNR is: " + pnr);
+                        break;
+
+                    case 2:
+                        // Cancellation form
+                        System.out.print("Enter PNR to cancel: ");
+                        String cancelPnr = scanner.nextLine();
+                        if (system.cancelReservation(cancelPnr)) {
+                            System.out.println("Reservation cancelled successfully.");
+                        } else {
+                            System.out.println("Invalid PNR or Reservation not found.");
+                        }
+                        break;
+
+                    case 3:
+                        // View reservation
+                        System.out.print("Enter PNR to view: ");
+                        String viewPnr = scanner.nextLine();
+                        System.out.println(system.viewReservation(viewPnr));
+                        break;
+
+                    case 4:
+                        exit = true;
+                        System.out.println("Exiting the system. Thank you!");
+                        break;
+
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            }
+        } else {
+            System.out.println("Login failed. Invalid credentials.");
+        }
+
+        scanner.close();
+    }
+}
